@@ -123,9 +123,9 @@ def createcharacter():
 #Muestro los personajes por su id
 @app.route('/character/<int:id>', methods=["GET"])
 def obtainig_character(id):
-    character: Character.query.filter_by(id=id).first()
-    if character is not None:
-         return jsonify(character.serialize_2()), 200
+    characterbyid= Character.query.filter_by(id=id).first()
+    if characterbyid is not None:
+         return jsonify(characterbyid.serialize_2()), 200
     else:
          return jsonify({"error":"Character not found"}),404
     
@@ -133,13 +133,31 @@ def obtainig_character(id):
 #Listo los personajes
 @app.route('/character', methods=["GET"])
 def character():
-    characters: Character.query.all()
-    characters: list(map(lambda character: character.serialize_2(), characters))
+    characters= Character.query.all()
+    characters= list(map(lambda character: character.serialize_2(), characters))
    
     return jsonify({
     "data": characters,
     "status": 'success'
   }),200   
+
+
+#Actualizo un Personaje
+@app.route('/updatecharacter', methods=["PUT"])
+def updatecharacter():
+  name_to_search = request.json.get("name")
+  charactertoupdate = Character.query.filter_by(name=name_to_search).first()
+  if charactertoupdate is None:
+    return "The character does not exist", 401
+  else:
+    charactertoupdate.name = request.json.get("name")
+    charactertoupdate.status = request.json.get("status")
+    charactertoupdate.species = request.json.get("species")
+    charactertoupdate.gender = request.json.get("gender")
+  
+    db.session.add(charactertoupdate)
+    db.session.commit()
+    return f"Se actualizo el personaje", 201
 
 #Elimino personaje  
 @app.route("/deletecharacter/<int:id>", methods=['DELETE'])
