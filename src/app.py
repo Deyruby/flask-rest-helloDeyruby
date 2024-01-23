@@ -176,36 +176,78 @@ def delete_character(id):
 
 
 #Agrego Episodios y locacion
-"""@app.route('/addepisodeslocation', methods=["POST"])
+@app.route('/addepisodeandlocation', methods=["POST"])
 def addepisodeandlocation():
- get_from_body = request.json.get("id_character")
- episodeandlocation = CharacterEpisodeAndLocation() 
- episodiosylocaciones = CharacterEpisodeAndLocation.query.filter_by(character_id=get_from_body).first()
- if episodiosylocaciones is not None:
-    return "The character already exist"
- else:
-    character.character_id = request.json.get("character_id")
-    character.name = request.json.get("name")
-    character.status = request.json.get("status")
-    character.species= request.json.get("species")
-    character.gender =request.json.get("gender")
+  episodeandlocation = CharacterEpisodeAndLocation() 
+  episodeandlocation.id_character = request.json.get("character_id")
+  episodeandlocation.name_character = request.json.get("name")
+  episodeandlocation.episode = request.json.get("episode")
+  episodeandlocation.location = request.json.get("location")
+    
 
-    db.session.add(character)
-    db.session.commit()  
-
-  return f"Se creo el usuario", 201"""
+  db.session.add(episodeandlocation)
+  db.session.commit()  
+  
+  return jsonify(episodeandlocation.serialize_3()), 201
 
 # Muestro episodios y locacion por id
 @app.route('/characterepisodeandlocation/<int:id>', methods=["GET"])
 def episode_location(id):
-    characterepiandloc: CharacterEpisodeAndLocation.query.filter_by(id=id).first()
+    characterepiandloc= CharacterEpisodeAndLocation.query.filter_by(id=id).first()
     if characterepiandloc is not None:
          return jsonify(characterepiandloc.serialize_3()), 200
     else:
          return jsonify({"error":"Character not found"}),404
+
+#Actualizo episodios y locacion 
+@app.route('/updateepisodeandlocation', methods=["PUT"])
+def updateepisodeandlocation():
+  id_to_search = request.json.get("id")
+  episodeandlocationtoupdate = Character.query.filter_by(id=id_to_search).first()
+  if episodeandlocationtoupdate is None:
+    return "The episode and location do not exist", 401
+  else:
+    episodeandlocationtoupdate.id_character = request.json.get("id_character")
+    episodeandlocationtoupdate.episode = request.json.get("episode")
+    episodeandlocationtoupdate.location = request.json.get("location")
     
+  
+    db.session.add(episodeandlocationtoupdate)
+    db.session.commit()
+    return f"Se actualizo episodio y locacion", 201     
 
+  #Eliminar episodios y locacion por id    
+@app.route("/deleteepisodeandlocation/<int:id>", methods=['DELETE'])
+def delete_episodeandlocation(id):
+  episodeandlocation_delete = Character.query.filter_by(id=id).first()
+  if episodeandlocation_delete is not None:
+    db.session.delete(episodeandlocation_delete)
+    db.session.commit()
+    return jsonify({
+      "msg": "Episodio y locacion eliminado",
+      "status": "Success"
+    }), 203
+  else:
+    return jsonify({"error":"Episodio y locacion no encontrada"}),404
+  
 
+#Crear favoritos para un usuario
+@app.route('/createfavorite', methods=["POST"])
+def createfavorite():
+ add_a_favorite = request.json.get("id")
+ favoritecharacter = Character() 
+ personaje_favorito = Character.query.filter_by(id=add_a_favorite).first()
+ if personaje_favorito is not None:
+    return "The Favorite character already exist"
+ else:
+    favoritecharacter.id_user = request.json.get("id_user")
+    favoritecharacter.id_character = request.json.get("id_character")
+   
+
+    db.session.add(favoritecharacter)
+    db.session.commit()  
+
+    return f"Se agrego el personaje favorito", 201
 
 #Listar los favoritos de un usuario
 @app.route('/favoritecharacter', methods=["GET"])
@@ -218,17 +260,7 @@ def favorite_character():
     "status": 'success'
   }),200            
      
-#Anadir un nuevo personaje
 
-   
-   
-#@app.route('/character', methods=['GET'])
-#def handle_hello():
-
-   #response_body = {
-        #"msg": "Hello, this is your GET /character response "}
-   
-   #return jsonify(response_body), 200
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':

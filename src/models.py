@@ -43,13 +43,12 @@ class CharacterEpisodeAndLocation(db.Model):
      __tablename__ = 'characterepisodeandlocation'
      id = db.Column (db.Integer, primary_key= True)
      id_character = db.Column (db.Integer, db.ForeignKey('character.id'))
+     character= db.relationship(Character)
      episode= db.Column(db.String, nullable= False)
      location= db.Column(db.String, nullable=False)
-     character= db.relationship(Character)
-     
+    
      def serialize_3(self):
-        return {
-            "id": self.id,
+         return {
             "id_character": self.id_character,
             "episode": self.episode,
             "location": self.location
@@ -63,8 +62,8 @@ class Favoritecharacter(db.Model):
    id_character = db.Column(db.Integer,db.ForeignKey('character.id')) # Marca el id del personaje que ha sido seleccionado como favorito
    character = db.relationship(Character)
 
-def serialize_3(self):
-        return {
+   def serialize_4(self):
+         return {
 
             "id": self.id,
             "id_user": self.id_user,
