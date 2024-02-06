@@ -18,7 +18,7 @@ app.url_map.strict_slashes = False
 #if db_url is not None:
   #  app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://")
 #else:
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///test.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 MIGRATE = Migrate(app, db)
@@ -188,7 +188,7 @@ def addepisodeandlocation():
   db.session.add(episodeandlocation)
   db.session.commit()  
   
-  return jsonify(episodeandlocation.serialize_3()), 201
+  return f"Se creo satisfactoriamente", 201
 
 # Muestro episodios y locacion por id
 @app.route('/characterepisodeandlocation/<int:id>', methods=["GET"])
@@ -203,7 +203,7 @@ def episode_location(id):
 @app.route('/updateepisodeandlocation', methods=["PUT"])
 def updateepisodeandlocation():
   id_to_search = request.json.get("id")
-  episodeandlocationtoupdate = Character.query.filter_by(id=id_to_search).first()
+  episodeandlocationtoupdate = CharacterEpisodeAndLocation.query.filter_by(id=id_to_search).first()
   if episodeandlocationtoupdate is None:
     return "The episode and location do not exist", 401
   else:
@@ -212,14 +212,14 @@ def updateepisodeandlocation():
     episodeandlocationtoupdate.location = request.json.get("location")
     
   
-    db.session.add(episodeandlocationtoupdate)
+    
     db.session.commit()
     return f"Se actualizo episodio y locacion", 201     
 
   #Eliminar episodios y locacion por id    
 @app.route("/deleteepisodeandlocation/<int:id>", methods=['DELETE'])
 def delete_episodeandlocation(id):
-  episodeandlocation_delete = Character.query.filter_by(id=id).first()
+  episodeandlocation_delete = CharacterEpisodeAndLocation.query.filter_by(id=id).first()
   if episodeandlocation_delete is not None:
     db.session.delete(episodeandlocation_delete)
     db.session.commit()
@@ -258,8 +258,34 @@ def favorite_character():
     return jsonify({
     "data": favoritecharacter,
     "status": 'success'
-  }),200            
-     
+  }),200   
+
+#Actualizar personaje favorito
+@app.route('/updatefavoritecharacter', methods=["PUT"])
+def updatefavoritecharacter():
+  id_to_search = request.json.get("id")
+  favorite_character_toupdate = Favoritecharacter.query.filter_by(id=id_to_search).first()
+  if favorite_character_toupdate is None:
+    return "The favorite character do not exist", 401
+  else:
+    favorite_character_toupdate.id_user = request.json.get("id_user")
+    favorite_character_toupdate.id_character = request.json.get("id_character")
+
+
+ #Eliminar Favorito de un usuario          
+@app.route("/deletefavorite/<int:id>", methods=['DELETE'])
+def delete_favorite(id):
+  favorite_delete = Favoritecharacter.query.filter_by(id=id).first()
+  if favorite_delete is not None:
+    db.session.delete(favorite_delete)
+    db.session.commit()
+    return jsonify({
+      "msg": "Personaje favorito eliminado",
+      "status": "Success"
+    }), 203
+  else:
+    return jsonify({"error":"Personaje favorito no encontrado"}),404
+    
 
 
 # this only runs if `$ python src/app.py` is executed

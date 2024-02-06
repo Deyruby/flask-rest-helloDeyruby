@@ -66,8 +66,8 @@ class Favoritecharacter(db.Model):
          return {
 
             "id": self.id,
-            "id_user": self.id_user,
-            "id_ character": self.id_character
+            "id_user": self.user.id,
+            "id_ character": self.character.id
         }
   
     
