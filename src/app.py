@@ -234,9 +234,9 @@ def delete_episodeandlocation(id):
 #Crear favoritos para un usuario
 @app.route('/createfavorite', methods=["POST"])
 def createfavorite():
- add_a_favorite = request.json.get("id")
- favoritecharacter = Character() 
- personaje_favorito = Character.query.filter_by(id=add_a_favorite).first()
+ add_a_favorite = request.json.get("id_character")
+ favoritecharacter = Favoritecharacter() 
+ personaje_favorito = Favoritecharacter.query.filter_by(id_character=add_a_favorite).first()
  if personaje_favorito is not None:
     return "The Favorite character already exist"
  else:
@@ -252,11 +252,11 @@ def createfavorite():
 #Listar los favoritos de un usuario
 @app.route('/favoritecharacter', methods=["GET"])
 def favorite_character():
-    favoritecharacter: Favoritecharacter.query.all()
-    favoritecharacter: list(map(lambda favoritecharacter: favorite_character.serialize_3(), favorite_character))
-   
-    return jsonify({
-    "data": favoritecharacter,
+  favoritocharacter= Favoritecharacter.query.all()
+  favoritocharacter= list(map(lambda favoritecharacter: favoritecharacter.serialize(), favoritocharacter))
+ 
+  return jsonify({
+    "data": favoritocharacter,
     "status": 'success'
   }),200   
 
@@ -270,6 +270,10 @@ def updatefavoritecharacter():
   else:
     favorite_character_toupdate.id_user = request.json.get("id_user")
     favorite_character_toupdate.id_character = request.json.get("id_character")
+
+    db.session.add(favorite_character_toupdate)
+    db.session.commit()
+    return f"Se actualizo el personaje favorito", 201
 
 
  #Eliminar Favorito de un usuario          

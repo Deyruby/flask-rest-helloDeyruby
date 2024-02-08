@@ -62,12 +62,13 @@ class Favoritecharacter(db.Model):
    id_character = db.Column(db.Integer,db.ForeignKey('character.id')) # Marca el id del personaje que ha sido seleccionado como favorito
    character = db.relationship(Character)
 
-   def serialize_4(self):
+   def serialize(self):
          return {
 
             "id": self.id,
             "id_user": self.user.id,
-            "id_ character": self.character.id
+            "id_ character": self.character.id,
+            "character_name": self.character.name
         }
   
     
